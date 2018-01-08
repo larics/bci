@@ -52,7 +52,7 @@
 
 #ifndef BCI_H
 #define BCI_H
-
+#define LINUX
 #include "integral.h"
 
 /*************************************************************************

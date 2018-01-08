@@ -167,6 +167,103 @@ int BCI_Status2Str (UINT16 Status, char *StatusStr)
 **    BCI_OK          - OK
 **
 *************************************************************************/
+
+
+int BCI_ParseCANMsg (BCI_ts_CanMsg * CANMsg, int *ID)
+{
+  int i;
+  char FrameFormatName[16];
+  char Status[16];
+
+  switch (CANMsg->mff)
+  {
+    case BCI_MFF_11_DAT:
+      strncpy (FrameFormatName, "11 bit data\0", 12);
+      break;
+    case BCI_MFF_29_DAT:
+      strncpy (FrameFormatName, "29 bit data\0", 12);
+      break;
+    case BCI_MFF_11_RMT:
+      strncpy (FrameFormatName, "11 bit rmt \0", 12);
+      break;
+    case BCI_MFF_29_RMT:
+      strncpy (FrameFormatName, "29 bit rmt \0", 12);
+      break;
+    case BCI_MFF_STS_MSG:
+      strncpy (FrameFormatName, "Status msg \0", 12);
+      break;
+    default:
+      strncpy (FrameFormatName, "???????????\0", 12);
+  }
+
+  switch (CANMsg->mff)
+  {
+    case BCI_MFF_11_DAT:
+    case BCI_MFF_29_DAT:
+    case BCI_MFF_11_RMT:
+    case BCI_MFF_29_RMT:
+    *ID = CANMsg->id;
+      //PRINTI ("ID [%8x] Fmt [%s] DLC [%d] [",
+              //CANMsg->id, FrameFormatName, CANMsg->dlc);
+      //for (i = 0; i < CANMsg->dlc; i++)
+        //PRINTI ("%02X ", CANMsg->a_data[i]);
+      //PRINTI ("]");
+      break;
+    case BCI_MFF_STS_MSG:
+      BCI_Status2Str (CANMsg->id, Status);
+      //PRINTI ("Status [ %s ]", Status);
+      break;
+
+    default:
+      PRINTI ("Unknown message frame format [ %d ]", CANMsg->mff);
+  }
+  PRINTI (" Time [%8d.%.8d]\n",
+          (CANMsg->time_stamp / 8) / 1000, (CANMsg->time_stamp / 8) % 1000);
+
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int BCI_ShowCANMsg (BCI_ts_CanMsg * CANMsg)
 {
   int i;
@@ -1233,8 +1330,8 @@ BCI_ReceiveCanMsg (BCI_BRD_HDL Interface, UINT8 CANNum,
   int ret = BCI_NO;
   t_Interface *pInterface = (t_Interface *) Interface;
 
-  PRINTD ("Receive CAN object for [%d] %s CANNum %d \n",
-          pInterface->DeviceFileDesc[0], pInterface->Name, CANNum);
+  //PRINTD ("Receive CAN object for [%d] %s CANNum %d \n",
+    //      pInterface->DeviceFileDesc[0], pInterface->Name, CANNum);
 
 // Check queue first       
   ret = (pInterface->CAN.ReceiveCANObj
@@ -1246,8 +1343,8 @@ BCI_ReceiveCanMsg (BCI_BRD_HDL Interface, UINT8 CANNum,
 
   if (Timeout != BCI_NO_WAIT)
   {                                         // Queue is empty, lets wait for Timeout
-    PRINTD ("WaitForData for [%d] %s\n",
-            pInterface->DeviceFileDesc[0], pInterface->Name);
+    //PRINTD ("WaitForData for [%d] %s\n",
+      //      pInterface->DeviceFileDesc[0], pInterface->Name);
 
     ret = (pInterface->WaitForData ((t_Interface *) Interface, CANNum, Timeout));
     if (ret == BCI_OK)
